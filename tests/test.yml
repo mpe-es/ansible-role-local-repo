@@ -1,0 +1,19 @@
+---
+###############################################################################
+# Filename: tests/test.yml
+# Role: ansible-role-local-repo
+# Summary: Minimal play used by the CI syntax-check stage
+# Last Updated: 14 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
+# The role resolves via the tests/roles/local_repo symlink, which points back
+# at the repository root. Ansible searches <playbook_dir>/roles by default, so
+# this works identically for a local run and in CI with no ANSIBLE_ROLES_PATH.
+- name: Configure local DNF repositories for an airgapped host
+  hosts: localhost
+  connection: local
+  # tasks/main.yml dispatches on ansible_facts['distribution'], so facts must
+  # be gathered for the role to select a platform task file.
+  gather_facts: true
+  roles:
+    - local_repo

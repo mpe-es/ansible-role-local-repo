@@ -1,0 +1,154 @@
+---
+###############################################################################
+# Filename: .github/workflows/ci.yml
+# Role: ansible-role-local-repo
+# Summary: Continuous Integration workflow for linting and testing
+# Last Updated: 14 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Run weekly to catch upstream changes
+    - cron: '0 6 * * 0'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least-privilege default token for all jobs; jobs override only as needed.
+permissions:
+  contents: read
+
+jobs:
+  ###########################################################
+  # Linting Stage
+  ###########################################################
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install linting dependencies
+        run: |
+          pip install --require-hashes -r requirements.txt
+
+      - name: Run yamllint
+        run: yamllint .
+
+      - name: Run ansible-lint
+        run: ansible-lint
+
+      - name: Run actionlint
+        # SHA-pinned so Dependabot tracks and updates it like the other actions.
+        # reporter: local + filter_mode: nofilter scans the whole tree with no
+        # diff and no extra token permissions (the job keeps its inherited
+        # contents: read); without nofilter, the local reporter needs a diff and
+        # fails with "diff command is empty". fail_level: any fails on any
+        # finding, including the shellcheck SC* info/style codes.
+        uses: reviewdog/action-actionlint@6fb7acc99f4a1008869fa8a0f09cfca740837d9d # v1.72.0
+        with:
+          reporter: local
+          filter_mode: nofilter
+          fail_level: any
+
+  ###########################################################
+  # Syntax Check Stage
+  ###########################################################
+  # NOTE: tasks/main.yml dispatches via include_tasks (dynamic), so
+  # --syntax-check validates the play and tasks/main.yml but does NOT descend
+  # into redhat.yml / oracle.yml. Those files are still fully parsed and
+  # checked by ansible-lint in the job above, so the role has no blind spot.
+  syntax:
+    name: Syntax Check
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Ansible
+        run: |
+          pip install --require-hashes -r requirements.txt
+
+      # No ANSIBLE_ROLES_PATH needed: tests/roles/local_repo is a symlink back
+      # to the repository root, and Ansible searches <playbook_dir>/roles by
+      # default. Local runs and CI resolve the role identically.
+      - name: Run syntax check
+        run: ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+
+  ###########################################################
+  # Security Scan Stage
+  ###########################################################
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  ###########################################################
+  # Final Status Check
+  ###########################################################
+  # Single required status context for branch protection. `if: always()` makes
+  # this job run even when an upstream job fails, so the gate reports a real
+  # verdict instead of being skipped.
+  check:
+    name: CI Status
+    if: always()
+    needs:
+      - lint
+      - syntax
+      - security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check job results
+        run: |
+          if [[ "${{ needs.lint.result }}" == "failure" ]] || \
+             [[ "${{ needs.syntax.result }}" == "failure" ]]; then
+            echo "One or more required jobs failed"
+            exit 1
+          fi
+          echo "All required jobs passed"

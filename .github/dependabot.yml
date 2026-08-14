@@ -1,0 +1,57 @@
+---
+###############################################################################
+# Filename: .github/dependabot.yml
+# Role: ansible-role-local-repo
+# Summary: Dependabot configuration for automated dependency updates
+# Last Updated: 14 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
+version: 2
+updates:
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+      - "ci"
+    # Supply-chain merge-cooldown: hold a bump PR until the release has aged
+    # past the detection window, so a compromised or yanked release is caught
+    # before adoption. Selection-time control, complementary to the SHA pins
+    # on the actions themselves. The Dependabot cooldown support table gives
+    # github-actions default-days ONLY (no semver tiering), so every action
+    # bump gets the single 5-day window. Aligned with the sibling repos.
+    cooldown:
+      default-days: 5
+
+  # Python dependencies (pip) — managed as a pip-compile lock:
+  # requirements.in is the source; requirements.txt is the hash-pinned,
+  # --require-hashes lock generated from it. The option below lets the
+  # Dependabot updater run `pip-compile` to regenerate requirements.txt so
+  # the source and lock stay in sync. NOTE: this permission applies ONLY to
+  # GitHub's isolated Dependabot updater computing dependency PRs — it has no
+  # effect on CI execution, the runtime role, or the deployed system.
+  - package-ecosystem: "pip"
+    directory: "/"
+    insecure-external-code-execution: allow
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "deps"
+    labels:
+      - "dependencies"
+      - "python"
+    # Supply-chain merge-cooldown: patch/minor get the standard 5-day detection
+    # window; majors get 10 (higher blast radius). Selection-time control,
+    # complementary to the --require-hashes lock. pip supports full semver
+    # tiering per the Dependabot cooldown support table.
+    cooldown:
+      default-days: 5
+      semver-patch-days: 5
+      semver-minor-days: 5
+      semver-major-days: 10

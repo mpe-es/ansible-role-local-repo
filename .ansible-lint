@@ -1,0 +1,43 @@
+---
+###############################################################################
+# Filename: .ansible-lint
+# Role: ansible-role-local-repo
+# Summary: Ansible linting configuration for CI/CD pipeline
+# Last Updated: 14 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
+
+# Profile: production (strictest built-in profile)
+profile: production
+
+# Enforce FQCN for all modules
+enable_list:
+  - fqcn-builtins
+  - no-changed-when
+
+# This role uses only ansible.builtin modules with no command/shell escapes,
+# so no rules are skipped outright. Add entries here only with a stated reason.
+skip_list: []
+
+# Warn but don't fail on these
+warn_list:
+  - experimental
+  # The repository directory is `ansible-role-local-repo`; ansible-lint expects
+  # a role directory matching ^[a-z][a-z0-9_]*$. The hyphenated name is the
+  # Galaxy/GitHub convention for role repos, so this is warned, not enforced.
+  - role-name
+
+# Exclude paths from linting
+exclude_paths:
+  - .github/
+  - .cache/
+  - .ansible/
+
+# Offline mode (don't download Galaxy dependencies during lint)
+offline: false
+
+# Use progressive mode for gradual adoption
+progressive: false
+
+# Strict mode - fail on warnings
+strict: true

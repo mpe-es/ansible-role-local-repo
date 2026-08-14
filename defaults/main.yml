@@ -1,0 +1,9 @@
+---
+# defaults file for ansible-repo-local-repo
+local_repo_server: repo.closednetwork.net
+local_baseos_repo_folder: rhel-10-for-x86_64-baseos-rpms
+local_appstream_repo_folder: rhel-10-for-x86_64-appstream-rpms
+oracle9_baseos_repo_folder: ol9_baseos_latest
+oracle9_appstream_repo_folder: ol9_appstream
+oracle9_gpg_key: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+web_protocol: https

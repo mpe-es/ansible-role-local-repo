@@ -1,0 +1,35 @@
+---
+# tasks file for ansible-repo-local-repo
+###########################################################
+# Remove Original DNF Repo Files
+###########################################################
+- name: Remove Oracle Repo files
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: absent
+  loop:
+    - /etc/yum.repos.d/oracle-linux-ol9.repo
+    - /etc/yum.repos.d/uek-ol9.repo
+    - /etc/yum.repos.d/virt-ol9.repo
+
+###########################################################
+# Add Base Repositories
+###########################################################
+- name: Add Oracle BaseOS Repository
+  ansible.builtin.yum_repository:
+    name: OL9-BaseOS
+    description: Oracle Linux BaseOS Respository Mirror
+    baseurl: "{{ web_protocol }}://{{ local_repo_server }}/{{ oracle9_baseos_repo_folder }}/"
+    gpgcheck: true
+    gpgkey: '{{ oracle9_gpg_key }}'
+    enabled: true
+    state: present
+- name: Add Oracle AppStream Repository
+  ansible.builtin.yum_repository:
+    name: OL9-AppStream
+    description: Oracle Linux AppStream Respository Mirror
+    baseurl: "{{ web_protocol }}://{{ local_repo_server }}/{{ oracle9_appstream_repo_folder }}/"
+    gpgcheck: true
+    gpgkey: '{{ oracle9_gpg_key }}'
+    enabled: true
+    state: present

@@ -1,0 +1,17 @@
+---
+###############################################################################
+# Filename: tasks/main.yml
+# Role: ansible-role-local-repo
+# Summary: Dispatch to the platform-specific repository configuration tasks
+# Last Updated: 14 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
+# ansible-lint name[template] requires any Jinja expression to be the LAST
+# element of a task name, hence the trailing-variable phrasing below.
+- name: "Configure local repositories for {{ ansible_facts['distribution'] }}"
+  ansible.builtin.include_tasks: redhat.yml
+  when: "ansible_facts['distribution'] in ['RedHat']"
+
+- name: "Configure local repositories for {{ ansible_facts['distribution'] }}"
+  ansible.builtin.include_tasks: oracle.yml
+  when: "ansible_facts['distribution'] in ['OracleLinux']"

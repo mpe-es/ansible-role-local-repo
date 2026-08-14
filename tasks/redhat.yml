@@ -1,0 +1,29 @@
+---
+# tasks file for ansible-repo-local-repo
+- name: Disable Subscription Manager for Offline Systems
+  ansible.builtin.lineinfile:
+    path: /etc/yum/pluginconf.d/subscription-manager.conf
+    regexp: '^enabled='
+    line: "enabled=0"
+- name: Remove RedHat Repo skeleton file
+  ansible.builtin.file:
+    path: /etc/yum.repos.d/redhat.repo
+    state: absent
+- name: Add Local RedHat BaseOS Repository
+  ansible.builtin.yum_repository:
+    name: rhel-for-x86_64-baseos-rpms
+    description: Red Hat Enterprise Linux for x86_64 - BaseOS (RPMs) Mirror
+    baseurl: "{{ web_protocol }}://{{ local_repo_server }}/{{ local_baseos_repo_folder }}"
+    gpgcheck: true
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+    enabled: true
+    state: present
+- name: Add RedHat 8 AppStream Repository
+  ansible.builtin.yum_repository:
+    name: rhel-for-x86_64-appstream-rpms
+    description: Red Hat Enterprise Linux for x86_64 - AppStream (RPMs) Mirror
+    baseurl: "{{ web_protocol }}://{{ local_repo_server }}/{{ local_appstream_repo_folder }}"
+    gpgcheck: true
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+    enabled: true
+    state: present

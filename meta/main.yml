@@ -1,0 +1,33 @@
+---
+###############################################################################
+# Filename: meta/main.yml
+# Role: ansible-role-local-repo
+# Summary: Ansible Role metadata for local DNF repository configuration
+# Last Updated: 14 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
+galaxy_info:
+  namespace: mpe_es
+  role_name: local_repo
+  author: Alex Ackerman
+  description: Add the Update Repository files for DNF for an airgap Network
+  company: REDACTED
+  license: MIT
+  min_ansible_version: '2.10'
+  platforms:
+    - name: EL
+      versions:
+        - '8'
+        - '9'
+        - '10'
+    - name: OracleLinux
+      versions:
+        - 'all'
+  galaxy_tags:
+    - repository
+    - dnf
+    - yum
+    - airgap
+    - rhel
+    - oraclelinux
+dependencies: []

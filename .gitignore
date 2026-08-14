@@ -1,0 +1,20 @@
+# Ansible runtime artifacts
+*.retry
+ansible.cfg
+.ansible/
+.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# CI scan output
+trivy-results.sarif
