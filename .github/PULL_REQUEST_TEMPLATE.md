@@ -44,6 +44,7 @@ ansible-playbook tests/test.yml -i tests/inventory --syntax-check
 - [ ] `Last Updated` is current in the banner of every file I changed
 - [ ] All modules use FQCN (`ansible.builtin.*`)
 - [ ] Documentation (README / CONTRIBUTING / defaults) updated as needed
+- [ ] `CHANGELOG.md` `[Unreleased]` section updated
 
 ## Security checklist
 
