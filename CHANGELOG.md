@@ -52,6 +52,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   or a CodeQL finding failed the Security Scan job while the single required
   status context for branch protection still reported success and the pull
   request stayed mergeable. (#9)
+- `CI Status` now requires `success` from every gated job rather than merely
+  not-`failure`. `needs.<job>.result` also yields `cancelled` and `skipped`,
+  and because the check carries `if: always()` it runs even when the workflow
+  is cancelled, so a cancelled Security Scan previously passed the gate with
+  no completed Trivy or SARIF evidence. (#10)
 - Enabled Dependabot alerts, Dependabot security updates, the dependency
   graph, secret scanning, secret scanning push protection, private
   vulnerability reporting, and code scanning ingestion for both CodeQL and
