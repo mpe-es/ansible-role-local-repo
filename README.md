@@ -1,6 +1,7 @@
 # Ansible Role: Assign Local Repository
 
-Sets the Yum repository for an airgap'd Enclave.
+Sets the DNF repository for an airgap'd Enclave with no access to 
+Internet repositories.
 
 ## Requirements
 
@@ -10,7 +11,7 @@ None
 
 You can modify any of the following variables as you wish in the role's `defaults/main.yml`:
 
-* `local_repo_server`: FQDN of the Yum Repository Server (Default: `repo.closednetwork.net`)
+* `local_repo_server`: FQDN of the Yum Repository Server (Default: `repo.closednetwork.local`)
 * `local_baseos_repo_folder`: Path to the RHEL Base OS Repo(Default: `rhel-10-for-x86_64-baseos-rpms`)
 * `local_appstream_repo_folder`: Path to the RHEL AppStream Repo(Default: `rhel-10-for-x86_64-appstream-rpms`)
 * `oracle9_baseos_repo_folder`: Path to the Oracle Linux 9 Base OS Repo(Default: `ol9_baseos_latest`)
@@ -42,7 +43,16 @@ Here is an example playbook using this role:
 
 ## License
 
-MIT
+Apache License 2.0. See [LICENSE](LICENSE) for the full text.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, testing, and code
+style. All participants are expected to follow the
+[Code of Conduct](CODE_OF_CONDUCT.md).
+
+To report a security vulnerability, follow the private disclosure process in
+[SECURITY.md](SECURITY.md) — please do not open a public issue.
 
 ## Author Information
 

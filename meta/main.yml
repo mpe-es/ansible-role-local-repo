@@ -11,7 +11,7 @@ galaxy_info:
   role_name: local_repo
   author: Alex Ackerman
   description: Add the Update Repository files for DNF for an airgap Network
-  license: MIT
+  license: Apache-2.0
   min_ansible_version: '2.10'
   platforms:
     - name: EL
