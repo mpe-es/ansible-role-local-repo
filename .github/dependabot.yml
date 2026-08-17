@@ -40,12 +40,12 @@ updates:
     cooldown:
       default-days: 5
 
-  # Python dependencies (pip) — managed as a pip-compile lock:
+  # Python dependencies (pip), managed as a pip-compile lock:
   # requirements.in is the source; requirements.txt is the hash-pinned,
   # --require-hashes lock generated from it. The option below lets the
   # Dependabot updater run `pip-compile` to regenerate requirements.txt so
   # the source and lock stay in sync. NOTE: this permission applies ONLY to
-  # GitHub's isolated Dependabot updater computing dependency PRs — it has no
+  # GitHub's isolated Dependabot updater computing dependency PRs. It has no
   # effect on CI execution, the runtime role, or the deployed system.
   - package-ecosystem: "pip"
     directory: "/"
