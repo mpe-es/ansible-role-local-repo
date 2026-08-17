@@ -1,5 +1,11 @@
 ---
-# tasks file for ansible-repo-local-repo
+###############################################################################
+# Filename: tasks/oracle.yml
+# Role: ansible-role-local-repo
+# Summary: Point Oracle Linux hosts at the local DNF repository mirrors
+# Last Updated: 17 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
 ###########################################################
 # Remove Original DNF Repo Files
 ###########################################################
@@ -13,9 +19,9 @@
     - /etc/yum.repos.d/virt-ol9.repo
 
 ###########################################################
-# Add Base Repositories
+# Add Local Oracle Base Repository Mirrors
 ###########################################################
-- name: Add Oracle BaseOS Repository
+- name: Add Oracle BaseOS Repository Mirror
   ansible.builtin.yum_repository:
     name: OL9-BaseOS
     description: Oracle Linux BaseOS Respository Mirror
@@ -24,7 +30,7 @@
     gpgkey: '{{ oracle9_gpg_key }}'
     enabled: true
     state: present
-- name: Add Oracle AppStream Repository
+- name: Add Oracle AppStream Repository Mirror
   ansible.builtin.yum_repository:
     name: OL9-AppStream
     description: Oracle Linux AppStream Respository Mirror
