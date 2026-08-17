@@ -1,0 +1,81 @@
+---
+###############################################################################
+# Filename: .github/ISSUE_TEMPLATE/feature_request.yml
+# Role: ansible-role-local-repo
+# Summary: Issue form for proposing an enhancement or new platform support
+# Last Updated: 17 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
+name: Feature request
+description: Propose new platform support or an enhancement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This role is deliberately small. Proposals that keep it small and
+        predictable are the most likely to be accepted. See CONTRIBUTING.md.
+  - type: checkboxes
+    attributes:
+      label: Preconditions
+      options:
+        - label: I searched existing issues and this is not a duplicate
+          required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - New platform or distribution support
+        - New or changed role variable
+        - Change to an existing default
+        - CI, tooling, or supply chain
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What gap or need does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should the role do?
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Target platform
+      description: If this concerns a specific distribution and version
+      placeholder: Oracle Linux 10
+    validations:
+      required: false
+  - type: checkboxes
+    id: security-impact
+    attributes:
+      label: Security impact
+      description: >
+        This role controls package provenance. Confirm whether the proposal
+        touches any of the following.
+      options:
+        - label: This proposal does NOT weaken or disable gpgcheck
+        - label: This proposal does NOT default web_protocol to http
+        - label: This proposal does NOT introduce a publicly registrable default hostname
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+    validations:
+      required: false
