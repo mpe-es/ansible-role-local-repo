@@ -153,9 +153,19 @@ jobs:
     steps:
       - name: Check job results
         run: |
+          # `security` is included in this gate. It was previously excluded
+          # because SARIF upload to code scanning could not succeed on a
+          # private repository without GitHub Advanced Security, which would
+          # have made the gate permanently red. The repository is public now,
+          # GHAS is available, and the security job passes, so a failure there
+          # is a real finding and must block the merge.
           if [[ "${{ needs.lint.result }}" == "failure" ]] || \
-             [[ "${{ needs.syntax.result }}" == "failure" ]]; then
+             [[ "${{ needs.syntax.result }}" == "failure" ]] || \
+             [[ "${{ needs.security.result }}" == "failure" ]]; then
             echo "One or more required jobs failed"
+            echo "  lint:     ${{ needs.lint.result }}"
+            echo "  syntax:   ${{ needs.syntax.result }}"
+            echo "  security: ${{ needs.security.result }}"
             exit 1
           fi
           echo "All required jobs passed"
