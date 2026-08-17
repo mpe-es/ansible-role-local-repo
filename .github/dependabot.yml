@@ -19,6 +19,18 @@ updates:
     labels:
       - "dependencies"
       - "ci"
+    # Dependabot treats github/codeql-action/init, /analyze, and /upload-sarif
+    # as three separate dependencies and opens a PR for each. codeql.yml runs
+    # init and analyze in the SAME job, and the CodeQL action hard-fails when
+    # the steps are on different versions:
+    #   "Loaded a configuration file for version 'X', but running version 'Y'"
+    # Each single-action PR is therefore individually un-mergeable, even though
+    # the three together are fine. Grouping them into one PR keeps every
+    # codeql-action reference on the same version.
+    groups:
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
     # Supply-chain merge-cooldown: hold a bump PR until the release has aged
     # past the detection window, so a compromised or yanked release is caught
     # before adoption. Selection-time control, complementary to the SHA pins
