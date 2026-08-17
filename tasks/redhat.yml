@@ -1,5 +1,11 @@
 ---
-# tasks file for ansible-repo-local-repo
+###############################################################################
+# Filename: tasks/redhat.yml
+# Role: ansible-role-local-repo
+# Summary: Point Red Hat Enterprise Linux hosts at the local DNF repo mirrors
+# Last Updated: 17 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
 - name: Disable Subscription Manager for Offline Systems
   ansible.builtin.lineinfile:
     path: /etc/yum/pluginconf.d/subscription-manager.conf
@@ -9,7 +15,7 @@
   ansible.builtin.file:
     path: /etc/yum.repos.d/redhat.repo
     state: absent
-- name: Add Local RedHat BaseOS Repository
+- name: Add Local RedHat BaseOS Repository Mirror
   ansible.builtin.yum_repository:
     name: rhel-for-x86_64-baseos-rpms
     description: Red Hat Enterprise Linux for x86_64 - BaseOS (RPMs) Mirror
@@ -18,7 +24,7 @@
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
     enabled: true
     state: present
-- name: Add RedHat 8 AppStream Repository
+- name: Add Local RedHat AppStream Repository Mirror
   ansible.builtin.yum_repository:
     name: rhel-for-x86_64-appstream-rpms
     description: Red Hat Enterprise Linux for x86_64 - AppStream (RPMs) Mirror

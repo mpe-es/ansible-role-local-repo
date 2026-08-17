@@ -1,6 +1,12 @@
 ---
-# defaults file for ansible-repo-local-repo
-local_repo_server: repo.closednetwork.net
+###############################################################################
+# Filename: defaults/main.yml
+# Role: ansible-role-local-repo
+# Summary: Default repository server, path, and GPG key variables
+# Last Updated: 17 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
+local_repo_server: repo.closednetwork.local
 local_baseos_repo_folder: rhel-10-for-x86_64-baseos-rpms
 local_appstream_repo_folder: rhel-10-for-x86_64-appstream-rpms
 oracle9_baseos_repo_folder: ol9_baseos_latest

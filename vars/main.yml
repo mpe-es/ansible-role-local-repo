@@ -1,2 +1,8 @@
 ---
-# vars file for ansible-role-local-repo
+###############################################################################
+# Filename: vars/main.yml
+# Role: ansible-role-local-repo
+# Summary: Role-internal variables (none defined; all settings are in defaults)
+# Last Updated: 17 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################

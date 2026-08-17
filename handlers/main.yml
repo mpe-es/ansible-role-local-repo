@@ -1,2 +1,8 @@
 ---
-# handlers file for ansible-role-local-repo
+###############################################################################
+# Filename: handlers/main.yml
+# Role: ansible-role-local-repo
+# Summary: Role handlers (none required; repo files need no service restart)
+# Last Updated: 17 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
