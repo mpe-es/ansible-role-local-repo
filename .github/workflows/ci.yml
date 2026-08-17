@@ -107,9 +107,16 @@ jobs:
     name: Security Scan
     runs-on: ubuntu-latest
     needs: lint
+    # `actions: read` is required by github/codeql-action/upload-sarif on a
+    # PRIVATE repository: the action calls GET /repos/{o}/{r}/actions/runs/{id}
+    # to resolve the run it is attaching results to. Without it the upload step
+    # fails with "Resource not accessible by integration". Public repos do not
+    # need it, but granting it is harmless and keeps this job's permissions
+    # consistent with the analyze job in codeql.yml, which already grants it.
     permissions:
-      contents: read
-      security-events: write
+      actions: read            # resolve the workflow run for the SARIF upload
+      contents: read           # checkout the repository
+      security-events: write   # upload results to code scanning
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
