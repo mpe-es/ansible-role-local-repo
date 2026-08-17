@@ -1,6 +1,6 @@
 # Ansible Role: Assign Local Repository
 
-Sets the DNF repository for an airgap'd Enclave with no access to 
+Sets the DNF repository for an airgap'd Enclave with no access to
 Internet repositories.
 
 ## Requirements
