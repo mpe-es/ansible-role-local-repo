@@ -3,7 +3,7 @@
 Thank you for your interest in contributing to this role!
 
 This role points RHEL and Oracle Linux hosts at a local DNF/YUM repository
-mirror for use in airgapped enclaves. It is deliberately small — contributions
+mirror for use in airgapped enclaves. It is deliberately small, and contributions
 that keep it small and predictable are the most welcome kind.
 
 ## Code of Conduct
@@ -43,7 +43,7 @@ python3 --version   # Should show Python 3.9.x
 python --version    # Should show Python 3.12.x
 ```
 
-> **⚠️ WARNING**: Do NOT change `python3` to point to Python 3.12. This will break
+> **WARNING**: Do NOT change `python3` to point to Python 3.12. This will break
 > `subscription-manager`, `dnf`, and other RHEL system tools. Recovery requires
 > manually creating a temporary repo with entitlement certificates to reinstall
 > `subscription-manager`. Don't ask how we know this.
@@ -149,7 +149,7 @@ fail the run. All three must pass before a pull request will be merged.
 > platform files via `include_tasks`, which is dynamic. `--syntax-check`
 > therefore validates the play and `tasks/main.yml` but does not descend into
 > `redhat.yml` or `oracle.yml`. Those files are fully parsed by `ansible-lint`,
-> so the role has no blind spot — but do not treat a passing syntax check alone
+> so the role has no blind spot, but do not treat a passing syntax check alone
 > as proof a platform task file is valid.
 
 ## How to Contribute
@@ -201,7 +201,7 @@ Security vulnerabilities must **not** be reported as public issues. See
   # Classification: UNCLASSIFIED
   ###############################################################################
   ```
-  Update `Last Updated` when you change a file. This is not decoration — the
+  Update `Last Updated` when you change a file. This is not decoration. The
   repository is reviewed against DoD marking expectations, and unmarked files
   are treated as a defect.
 - **Use FQCN for all modules** (`ansible.builtin.yum_repository`, not

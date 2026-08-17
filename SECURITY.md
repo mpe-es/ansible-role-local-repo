@@ -3,8 +3,8 @@
 ## Reporting a Vulnerability
 
 The `ansible-role-local-repo` project takes security seriously. Because this
-role rewrites DNF/YUM repository configuration — including the base URLs and GPG
-key paths that govern where packages come from and how they are verified — on
+role rewrites DNF/YUM repository configuration, including the base URLs and GPG
+key paths that govern where packages come from and how they are verified, on
 hosts intended for airgapped DoD enclaves, vulnerability handling is treated as
 a high priority.
 

@@ -52,7 +52,7 @@ style. All participants are expected to follow the
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
 To report a security vulnerability, follow the private disclosure process in
-[SECURITY.md](SECURITY.md) — please do not open a public issue.
+[SECURITY.md](SECURITY.md). Please do not open a public issue.
 
 ## Author Information
 
