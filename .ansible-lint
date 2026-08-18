@@ -3,7 +3,7 @@
 # Filename: .ansible-lint
 # Role: ansible-role-local-repo
 # Summary: Ansible linting configuration for CI/CD pipeline
-# Last Updated: 14 Aug 2026
+# Last Updated: 18 Aug 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
 
@@ -15,8 +15,11 @@ enable_list:
   - fqcn-builtins
   - no-changed-when
 
-# This role uses only ansible.builtin modules with no command/shell escapes,
-# so no rules are skipped outright. Add entries here only with a stated reason.
+# This role uses only ansible.builtin modules. It carries exactly one
+# ansible.builtin.command task -- `update-ca-trust extract`, which has no module
+# equivalent -- and that task supplies an explicit `changed_when`, so
+# no-changed-when is satisfied rather than skipped. No rules are skipped
+# outright. Add entries here only with a stated reason.
 skip_list: []
 
 # Warn but don't fail on these

@@ -1,0 +1,38 @@
+---
+###############################################################################
+# Filename: tasks/configure-ca.yml
+# Role: ansible-role-local-repo
+# Summary: Install the enclave trust anchors and rebuild the system trust store
+# Last Updated: 18 Aug 2026
+# Classification: UNCLASSIFIED
+###############################################################################
+# Trust bootstrap ordering: the anchors must land and the trust store must be
+# rebuilt BEFORE the repository files are written, because those repositories
+# are served over HTTPS by a host whose certificate this CA issued.
+- name: Download Enclave Trusted CA Certificates
+  ansible.builtin.get_url:
+    url: '{{ item.url }}'
+    dest: "/etc/pki/ca-trust/source/anchors/{{ item.name }}.pem"
+    checksum: '{{ item.checksum | default("") }}'
+    owner: root
+    group: root
+    mode: '0644'
+    seuser: system_u
+    setype: cert_t
+    # The anchor is fetched from the server whose certificate it validates, so
+    # there is nothing to validate against on a first run. Set `checksum` on
+    # each entry to pin the anchor; that is the control that replaces TLS
+    # validation here, and get_url fails closed when the digest does not match.
+    validate_certs: false
+  loop: '{{ enclave_ca_certificates }}'
+  loop_control:
+    label: '{{ item.name }}'
+  notify: Update System Trusted Certificate Authorities
+
+# Flush immediately instead of letting the handler wait for the end of the
+# play. `update-ca-trust extract` must complete before this role writes the
+# repository files and before any later role opens an HTTPS connection to the
+# mirror; a deferred handler would leave both running against a trust store
+# that has not been rebuilt yet.
+- name: Rebuild the trust store before any repository is configured
+  ansible.builtin.meta: flush_handlers

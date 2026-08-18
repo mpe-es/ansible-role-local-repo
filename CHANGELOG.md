@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Optional enclave certificate authority trust, gated behind
+  `configure_local_cert_authority` (default `false`, so existing consumers see
+  no behavior change). The role installs each anchor listed in
+  `enclave_ca_certificates` into `/etc/pki/ca-trust/source/anchors` and runs
+  `update-ca-trust extract` before any repository file is written, because the
+  mirrors are served over HTTPS by a host this CA issued. Anchors are fetched
+  with `validate_certs: false` -- unavoidable during a trust bootstrap -- so
+  each entry accepts an optional `checksum` pin, which is the control that
+  substitutes for TLS validation and fails closed on mismatch.
 - Community health files: `LICENSE` (Apache 2.0), `CODE_OF_CONDUCT.md`
   (Contributor Covenant 2.1), `CONTRIBUTING.md`, `SECURITY.md`, and
   `CODEOWNERS`.

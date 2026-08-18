@@ -2,8 +2,8 @@
 ###############################################################################
 # Filename: defaults/main.yml
 # Role: ansible-role-local-repo
-# Summary: Default repository server, path, and GPG key variables
-# Last Updated: 17 Aug 2026
+# Summary: Default repository server, path, GPG key, and CA trust variables
+# Last Updated: 18 Aug 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
 local_repo_server: repo.closednetwork.local
@@ -13,3 +13,22 @@ oracle9_baseos_repo_folder: ol9_baseos_latest
 oracle9_appstream_repo_folder: ol9_appstream
 oracle9_gpg_key: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
 web_protocol: https
+
+###############################################################################
+# Enclave certificate authority trust
+###############################################################################
+# Off by default: an enclave that already distributes its trust anchors through
+# another channel must see no behavior change from this role.
+configure_local_cert_authority: false
+
+# One entry per trust anchor. `name` becomes the filename written to
+# /etc/pki/ca-trust/source/anchors/<name>.pem. `checksum` is optional and takes
+# the get_url form ('sha256:<digest>'); populate it to pin the anchor, which is
+# the control that substitutes for TLS validation during the trust bootstrap.
+# A single entry may carry a concatenated PEM bundle (root plus issuing CAs) --
+# p11-kit reads multi-certificate anchor files -- but separate entries keep the
+# chain legible and let each anchor carry its own pin.
+enclave_ca_certificates:
+  - name: enclave-ca
+    url: "{{ web_protocol }}://{{ local_repo_server }}/certs/trusted-ca.pem"
+    checksum: ''

@@ -2,7 +2,22 @@
 ###############################################################################
 # Filename: handlers/main.yml
 # Role: ansible-role-local-repo
-# Summary: Role handlers (none required; repo files need no service restart)
-# Last Updated: 17 Aug 2026
+# Summary: Rebuild the system trust store when an enclave anchor changes
+# Last Updated: 18 Aug 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
+# `update-ca-trust extract` rewrites every file under
+# /etc/pki/ca-trust/extracted unconditionally, so neither mtime nor a `creates`
+# guard is a usable change marker. Running as a handler is the marker: it fires
+# only when an anchor actually changed, which makes `changed_when: true` an
+# accurate report rather than a lint appeasement.
+#
+# `extract` is the only form supported on RHEL 10; the legacy `enable` argument
+# was removed there and exits non-zero. Oracle Linux 9 still accepts it but
+# warns that it is deprecated.
+- name: Update System Trusted Certificate Authorities
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/update-ca-trust
+      - extract
+  changed_when: true
