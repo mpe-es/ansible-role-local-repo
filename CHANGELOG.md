@@ -43,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and the `pre-commit-hooks` hygiene hooks (trailing-whitespace,
   end-of-file-fixer, check-yaml, check-added-large-files,
   check-merge-conflict, detect-private-key) are `repo: local` hooks like
-  ansible-lint, and `pre-commit-hooks==5.0.0` is pinned in `requirements.in`.
+  ansible-lint, and `pre-commit-hooks` is pinned in `requirements.in`.
   pre-commit downloads nothing, Dependabot's pip updates cover every hook, and
   the yamllint hook no longer lags the lock (it was v1.35.1 against 1.38.0).
 - The CI lint job runs `pre-commit run --all-files` in place of separate
@@ -62,6 +62,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed the extra trailing blank line from `tests/inventory`, which the
   end-of-file-fixer hook now enforces in CI.
 
+### Security
+
+- Bump the toolchain's transitive `filelock` from 3.32.3 to 4.2.10, fixing
+  CVE-2026-112940 (HIGH) and the 11 other Dependabot alerts against it.
+  `filelock` is only in the lint and CI toolchain (`requirements.txt`);
+  nothing the role installs on a managed host was affected. (#51)
+
 ### Dependencies
 
 - Bump pre-commit from 4.6.2 to 4.7.0 (#28)
@@ -72,6 +79,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bump black from 26.5.1 to 26.10.1 (#35)
 - Bump reviewdog/action-actionlint from 1.79.1 to 1.81.0 (#36)
 - Bump ansible-core from 2.21.4 to 2.21.6 (#37)
+- Bump ansible-lint from 26.10.1 to 26.11.0 (#45)
+- Bump reviewdog/action-actionlint from 1.81.0 to 1.84.0 (#46)
+- Bump pre-commit-hooks from 5.0.0 to 6.0.0 (#47)
 
 ## [1.0.0] - 2026-10-15
 
