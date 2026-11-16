@@ -45,6 +45,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on a host with egress could resolve and reach a third-party server.
 - Removed the optional `galaxy_info.company` field.
 - Reworded the README summary from Yum to DNF.
+- The ansible-lint pre-commit hook is now a `repo: local` hook that runs the
+  ansible-lint and ansible-core installed from `requirements.txt`. The hook
+  previously pinned its own copies of both versions, which Dependabot does not
+  update, so they drifted behind the lock and local lint disagreed with CI.
+  The hook runs on every commit, as before. The config now requires pre-commit
+  4.5.0 or later (`minimum_pre_commit_version`). Contributors must install
+  `requirements.txt`, activate the venv if used, and run `pre-commit install`
+  from that toolchain. See `CONTRIBUTING.md`.
 
 ### Fixed
 

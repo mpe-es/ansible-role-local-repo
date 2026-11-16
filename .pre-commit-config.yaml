@@ -3,11 +3,14 @@
 # Filename: .pre-commit-config.yaml
 # Role: ansible-role-local-repo
 # Summary: Pre-commit hooks for local linting before push
-# Last Updated: 14 Aug 2026
+# Last Updated: 16 Nov 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+
+# 4.5.0 introduced `language: unsupported`, used by the ansible-lint hook.
+minimum_pre_commit_version: '4.5.0'
 
 repos:
   # YAML Linting
@@ -19,15 +22,15 @@ repos:
         types: [yaml]
 
   # Ansible Linting
-  # Note: ansible-core 2.21+ requires Python 3.12+ (matches requirements.txt)
-  - repo: https://github.com/ansible/ansible-lint
-    rev: 9bce2bfb8f4a984e6b13767bc0d6bf0a49492164  # frozen: v26.10.1
+  # Runs the ansible-lint installed from requirements.txt (see CONTRIBUTING.md).
+  - repo: local
     hooks:
       - id: ansible-lint
-        args: []
-        language_version: python3.12
-        additional_dependencies:
-          - ansible-core==2.21.6
+        name: ansible-lint
+        entry: ansible-lint
+        language: unsupported
+        pass_filenames: false
+        always_run: true
 
   # General file hygiene
   - repo: https://github.com/pre-commit/pre-commit-hooks
