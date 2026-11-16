@@ -136,7 +136,8 @@ The following hooks are configured:
 - **detect-private-key** - Prevent accidental key commits
 
 The CI lint job runs these hooks with `pre-commit run --all-files`, plus
-actionlint on the workflows. A commit only checks the files it stages, so run
+actionlint on the workflows. At commit time ansible-lint scans the whole
+project, but the other hooks check only the files the commit stages, so run
 `pre-commit run --all-files` before pushing to match the lint job.
 
 #### Every hook uses your installed toolchain
