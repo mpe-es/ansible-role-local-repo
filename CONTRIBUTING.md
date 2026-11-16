@@ -123,25 +123,34 @@ pre-commit run --all-files
 
 The following hooks are configured:
 - **yamllint** - YAML syntax and style validation
-- **ansible-lint** - Ansible best practices (production profile), run from
-  your installed `requirements.txt` toolchain (see below)
+- **ansible-lint** - Ansible best practices (production profile)
 - **trailing-whitespace** - Remove trailing whitespace
 - **end-of-file-fixer** - Ensure files end with newline
 - **check-yaml** - Validate YAML syntax
-- **check-added-large-files** - Prevent large files (>500KB)
-- **check-merge-conflict** - Detect merge conflict markers
+- **check-added-large-files** - Reject any file over 500 KB, new or
+  existing (`--enforce-all`)
+- **check-merge-conflict** - Reject conflict markers in any file, even
+  outside a merge (`--assume-in-merge`; it matches the standard Git marker
+  lines, so a Markdown heading underlined with exactly `=======` is also
+  rejected)
 - **detect-private-key** - Prevent accidental key commits
 
-#### The ansible-lint hook uses your installed toolchain
+The CI lint job runs these hooks with `pre-commit run --all-files`, plus
+actionlint on the workflows. A commit only checks the files it stages, so run
+`pre-commit run --all-files` before pushing to match the lint job.
 
-The ansible-lint hook is a `repo: local` hook. pre-commit does not build an
-environment for it; it runs whichever `ansible-lint` is first on your `PATH`.
-That is the ansible-lint and ansible-core you installed from the hash-pinned
-`requirements.txt`, which are the same versions CI runs. A lint rule that would
-fail in CI therefore fails your commit first, and there is no second copy of
-the versions in `.pre-commit-config.yaml` to keep in sync. For Python tooling,
-Dependabot updates `requirements.in` and `requirements.txt` only. The hook runs
-on every commit, including commits that only change the lock.
+#### Every hook uses your installed toolchain
+
+Every hook is a `repo: local` hook. pre-commit does not build an environment
+or download anything for them; each runs the matching command (`yamllint`,
+`ansible-lint`, `trailing-whitespace-fixer`, and the other
+`pre-commit-hooks` commands) that is first on your `PATH`. Those are the
+versions you installed from the hash-pinned `requirements.txt`, which are the
+same versions CI runs, so a rule that fails in CI also fails your commit for
+the files it stages, and there is no second copy of any version in
+`.pre-commit-config.yaml` to keep in sync. For Python tooling, Dependabot
+updates `requirements.in` and `requirements.txt` only. The ansible-lint hook
+runs on every commit, including commits that only change the lock.
 
 This means:
 
@@ -163,37 +172,42 @@ This means:
   python -m pip install --require-hashes -r requirements.txt
   ```
 
-  Until you do, the hook lints with the previous versions and can disagree
-  with CI.
+  Until you do, the hooks run the previous versions and can disagree with CI.
 - **Check the versions match.** `ansible-lint --version` reports the
-  ansible-lint and ansible-core versions in use. They should equal the
-  `ansible-lint==` and `ansible-core==` pins in `requirements.txt`.
+  ansible-lint and ansible-core versions in use, `yamllint --version` the
+  yamllint version, and `python -m pip show pre-commit-hooks` the hygiene
+  hooks' version. They should equal the pins in `requirements.txt`.
+- **When `pre-commit-hooks` is bumped,** the local hook definitions in
+  `.pre-commit-config.yaml` are a copy of upstream's `.pre-commit-hooks.yaml`
+  for the pinned version. Compare them with the new version's file in the same
+  pull request and carry over any changed `entry`, `types`, or `stages`.
 
 Troubleshooting:
 
-- ``Executable `ansible-lint` not found``: the dependencies are not installed
-  or the venv is not active.
+- ``Executable `<command>` not found``: the dependencies are not installed or
+  the venv is not active.
 - `pre-commit version 4.5.0 is required but version X is installed`: the git
   hook was installed by an older pre-commit. Rerun `pre-commit install` as
   described above.
-- A traceback, or lint results that differ from CI: another `ansible-lint`
+- A traceback, or results that differ from CI: another copy of the tool
   earlier on your `PATH` (for example a pipx or distro copy) is being used.
-  Check that `command -v ansible-lint` points into your venv or Option A
-  install and that `ansible-lint --version` matches `requirements.txt`.
+  Check that `command -v ansible-lint` (or the failing command) points into
+  your venv or Option A install, and that the version check above matches
+  `requirements.txt`.
 
 ### Testing
 
-This role has no Molecule suite. The full local test cycle is the same three
-checks CI runs:
+This role has no Molecule suite. The full local test cycle is the same lint
+and syntax checks CI runs (CI also runs actionlint and a Trivy scan):
 
 ```bash
-yamllint .
-ansible-lint
+pre-commit run --all-files
 ansible-playbook tests/test.yml -i tests/inventory --syntax-check
 ```
 
-`ansible-lint` runs the `production` profile with `strict: true`, so warnings
-fail the run. All three must pass before a pull request will be merged.
+The pre-commit run includes yamllint and ansible-lint. `ansible-lint` runs the
+`production` profile with `strict: true`, so warnings fail the run. Both must
+pass before a pull request will be merged.
 
 > **Note on syntax-check coverage**: `tasks/main.yml` dispatches to the
 > platform files via `include_tasks`, which is dynamic. `--syntax-check`
@@ -225,8 +239,7 @@ Security vulnerabilities must **not** be reported as public issues. See
 3. **Follow the code style** documented below
 4. **Test your changes**:
    ```bash
-   yamllint .
-   ansible-lint
+   pre-commit run --all-files
    ansible-playbook tests/test.yml -i tests/inventory --syntax-check
    ```
 5. **Commit** using [Conventional Commits](https://www.conventionalcommits.org/):
