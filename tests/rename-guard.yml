@@ -1,0 +1,71 @@
+---
+###############################################################################
+# Filename: tests/rename-guard.yml
+# Role: ansible-role-local-repo
+# Summary: Regression test for the 2.0.0 variable-rename guards
+# Last Updated: 16 Nov 2026
+# Classification: UNCLASSIFIED
+###############################################################################
+# Run with --check. Every case stops at a guard, or at the first anchor
+# download, before any task changes the host: .invalid (RFC 6761) never
+# resolves.
+# The 1.x variable names are the test input, hence the var-naming noqa.
+- name: Rename guard regression test
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    local_repo_server: mirror.example.invalid
+    pinned_anchors:
+      - name: pinned-root
+        url: https://mirror.example.invalid/root-ca.pem
+        checksum: "sha256:{{ '0' * 64 }}"
+  tasks:
+    - name: Each entry point rejects a 1.x variable name
+      loop: [main.yml, redhat.yml, oracle.yml, configure-ca.yml]
+      loop_control:
+        loop_var: case_entry
+      ansible.builtin.include_tasks: rename-guard-case.yml
+      vars:
+        case_tasks_from: "{{ case_entry }}"
+        web_protocol: https  # noqa: var-naming[no-role-prefix]
+        case_expect: Role 2.0.0 renamed
+
+    - name: A 1.x name set to an unresolvable template is still rejected
+      ansible.builtin.include_tasks: rename-guard-case.yml
+      vars:
+        case_tasks_from: redhat.yml
+        web_protocol: "{{ undefined_test_reference }}"  # noqa: var-naming[no-role-prefix]
+        case_expect: Role 2.0.0 renamed
+
+    - name: A 1.x CA list set to an unresolvable template stops at the CA guard
+      ansible.builtin.include_tasks: rename-guard-case.yml
+      vars:
+        case_tasks_from: configure-ca.yml
+        enclave_ca_certificates: "{{ undefined_test_reference }}"  # noqa: var-naming[no-role-prefix]
+        case_expect_task: Reject CA anchors left under the pre-2.0.0 list name
+
+    - name: The configure-ca.yml entry point rejects anchors under the 1.x list name
+      ansible.builtin.include_tasks: rename-guard-case.yml
+      vars:
+        case_tasks_from: configure-ca.yml
+        enclave_ca_certificates: "{{ pinned_anchors }}"  # noqa: var-naming[no-role-prefix]
+        case_expect: the role reads only local_repo_enclave_ca_certificates
+
+    - name: A caller passing its anchor list through reaches the download
+      ansible.builtin.include_tasks: rename-guard-case.yml
+      vars:
+        case_tasks_from: configure-ca.yml
+        enclave_ca_certificates: "{{ pinned_anchors }}"  # noqa: var-naming[no-role-prefix]
+        local_repo_enclave_ca_certificates: "{{ pinned_anchors }}"
+        case_expect_task: Download Enclave Trusted CA Certificates
+        case_expect_url: https://mirror.example.invalid/root-ca.pem
+
+    - name: The 2.0.0 names and a caller owning the 1.x CA names pass
+      ansible.builtin.include_role:
+        name: local_repo
+        tasks_from: assert-renamed.yml
+      vars:
+        local_repo_web_protocol: https
+        configure_local_cert_authority: true  # noqa: var-naming[no-role-prefix]
+        enclave_ca_certificates: "{{ pinned_anchors }}"  # noqa: var-naming[no-role-prefix]

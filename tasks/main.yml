@@ -3,19 +3,21 @@
 # Filename: tasks/main.yml
 # Role: ansible-role-local-repo
 # Summary: Dispatch to the platform-specific repository configuration tasks
-# Last Updated: 18 Aug 2026
+# Last Updated: 16 Nov 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
-# ansible-lint name[template] requires any Jinja expression to be the LAST
-# element of a task name, hence the trailing-variable phrasing below.
+- name: Reject the pre-2.0.0 variable names
+  ansible.builtin.import_tasks: assert-renamed.yml
 
 # Trust first. The repository mirrors below are reached over HTTPS, so the
 # enclave anchors have to be installed before any repository file is written.
 - name: Configure Enclave Certificate Authorities
   ansible.builtin.include_tasks: configure-ca.yml
   when:
-    - configure_local_cert_authority
+    - local_repo_configure_cert_authority | bool
 
+# ansible-lint name[template] requires any Jinja expression to be the LAST
+# element of a task name, hence the trailing-variable phrasing below.
 - name: "Configure local repositories for {{ ansible_facts['distribution'] }}"
   ansible.builtin.include_tasks: redhat.yml
   when: "ansible_facts['distribution'] in ['RedHat']"

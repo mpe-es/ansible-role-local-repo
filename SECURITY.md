@@ -35,8 +35,8 @@ understand and reproduce the issue:
 - The target platform (RHEL 8/9/10 or Oracle Linux 9)
 - The Ansible / ansible-core version used to run the role
 - The repository server configuration in use (`local_repo_server`,
-  `web_protocol`, and the repo folder variables), with any internal hostnames
-  redacted
+  `local_repo_web_protocol`, and the repo folder variables), with any internal
+  hostnames redacted
 - A description of the vulnerability and its potential impact
 - Steps to reproduce the issue
 - Any proof-of-concept code or playbook (please mark clearly as such)
@@ -106,10 +106,11 @@ Operators deploying this role should be aware of the following:
   sets `gpgcheck: true` with an explicit `gpgkey` path. Disabling GPG checking
   removes the only integrity control on packages served by the mirror. Do not
   override this.
-- **`web_protocol` defaults to `https`.** Overriding it to `http` sends
-  repository metadata and packages in cleartext. GPG checking still protects
-  package integrity, but the transport provides no confidentiality and no
-  protection against an on-path observer profiling the host's patch level.
+- **`local_repo_web_protocol` defaults to `https`.** Overriding it to `http`
+  sends repository metadata and packages in cleartext. GPG checking still
+  protects package integrity, but the transport provides no confidentiality
+  and no protection against an on-path observer profiling the host's patch
+  level.
 - **`local_repo_server` must point at infrastructure you control.** The default
   is a non-routable placeholder. Pointing this at an untrusted or externally
   registrable hostname redirects all package installation for the target host.

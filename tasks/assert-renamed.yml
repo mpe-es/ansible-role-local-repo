@@ -1,0 +1,33 @@
+---
+###############################################################################
+# Filename: tasks/assert-renamed.yml
+# Role: ansible-role-local-repo
+# Summary: Reject variables renamed in 2.0.0; imported by every entry point
+# Last Updated: 16 Nov 2026
+# Classification: UNCLASSIFIED
+###############################################################################
+# configure_local_cert_authority and enclave_ca_certificates may be a calling
+# role's own variables, which are visible here, so they are not rejected by
+# name; tasks/configure-ca.yml checks the old list before installing anchors.
+# varnames matches a name even when its value is an unresolvable template,
+# which `is undefined` would report as undefined.
+- name: Reject the pre-2.0.0 variable names
+  ansible.builtin.assert:
+    that:
+      - query('ansible.builtin.varnames', local_repo_renamed_pattern) | length == 0
+    fail_msg: >-
+      Role 2.0.0 renamed its variables to the local_repo_ prefix. Found:
+      {{ query('ansible.builtin.varnames', local_repo_renamed_pattern) | join(', ') }}.
+      Rename:
+      local_baseos_repo_folder -> local_repo_baseos_folder,
+      local_appstream_repo_folder -> local_repo_appstream_folder,
+      oracle9_baseos_repo_folder -> local_repo_oracle9_baseos_folder,
+      oracle9_appstream_repo_folder -> local_repo_oracle9_appstream_folder,
+      oracle9_gpg_key -> local_repo_oracle9_gpg_key,
+      web_protocol -> local_repo_web_protocol,
+      configure_local_cert_authority -> local_repo_configure_cert_authority,
+      enclave_ca_certificates -> local_repo_enclave_ca_certificates.
+    quiet: true
+  vars:
+    local_repo_renamed_pattern: >-
+      ^(local_baseos_repo_folder|local_appstream_repo_folder|oracle9_baseos_repo_folder|oracle9_appstream_repo_folder|oracle9_gpg_key|web_protocol)$

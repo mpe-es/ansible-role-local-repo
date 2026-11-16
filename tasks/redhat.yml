@@ -3,9 +3,12 @@
 # Filename: tasks/redhat.yml
 # Role: ansible-role-local-repo
 # Summary: Point Red Hat Enterprise Linux hosts at the local DNF repo mirrors
-# Last Updated: 17 Aug 2026
+# Last Updated: 16 Nov 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
+- name: Reject the pre-2.0.0 variable names
+  ansible.builtin.import_tasks: assert-renamed.yml
+
 - name: Disable Subscription Manager for Offline Systems
   ansible.builtin.lineinfile:
     path: /etc/yum/pluginconf.d/subscription-manager.conf
@@ -19,7 +22,7 @@
   ansible.builtin.yum_repository:
     name: rhel-for-x86_64-baseos-rpms
     description: Red Hat Enterprise Linux for x86_64 - BaseOS (RPMs) Mirror
-    baseurl: "{{ web_protocol }}://{{ local_repo_server }}/{{ local_baseos_repo_folder }}"
+    baseurl: "{{ local_repo_web_protocol }}://{{ local_repo_server }}/{{ local_repo_baseos_folder }}"
     gpgcheck: true
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
     enabled: true
@@ -28,7 +31,7 @@
   ansible.builtin.yum_repository:
     name: rhel-for-x86_64-appstream-rpms
     description: Red Hat Enterprise Linux for x86_64 - AppStream (RPMs) Mirror
-    baseurl: "{{ web_protocol }}://{{ local_repo_server }}/{{ local_appstream_repo_folder }}"
+    baseurl: "{{ local_repo_web_protocol }}://{{ local_repo_server }}/{{ local_repo_appstream_folder }}"
     gpgcheck: true
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
     enabled: true

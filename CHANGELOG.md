@@ -7,6 +7,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING:** every role variable now carries the `local_repo_` prefix, so
+  the interface is consistent and ansible-lint's `var-naming[no-role-prefix]`
+  passes for roles that include this one. Renamed:
+  `local_baseos_repo_folder` -> `local_repo_baseos_folder`,
+  `local_appstream_repo_folder` -> `local_repo_appstream_folder`,
+  `oracle9_baseos_repo_folder` -> `local_repo_oracle9_baseos_folder`,
+  `oracle9_appstream_repo_folder` -> `local_repo_oracle9_appstream_folder`,
+  `oracle9_gpg_key` -> `local_repo_oracle9_gpg_key`,
+  `web_protocol` -> `local_repo_web_protocol`,
+  `configure_local_cert_authority` -> `local_repo_configure_cert_authority`,
+  `enclave_ca_certificates` -> `local_repo_enclave_ca_certificates`.
+  Every entry point, including `tasks_from`, first runs
+  `tasks/assert-renamed.yml`, which fails, naming every rename, if any of the
+  first six old names is defined in scope. The two CA names are not rejected
+  outright because a calling role may own them; instead
+  `tasks/configure-ca.yml` refuses to install anchors while
+  `enclave_ca_certificates` differs from `local_repo_enclave_ca_certificates`,
+  which would otherwise install `local_repo_enclave_ca_certificates` (by
+  default an unpinned anchor) in place of the caller's list. A 1.x caller
+  that still sets `configure_local_cert_authority: true` through the main
+  entry point silently gets CA trust off, which surfaces as a TLS error
+  against the mirror. `tests/rename-guard.yml` runs in CI through every entry
+  point. See README "Upgrading from 1.x".
+- The ansible-lint pre-commit hook is now a `repo: local` hook that runs the
+  ansible-lint and ansible-core installed from `requirements.txt`. The hook
+  previously pinned its own copies of both versions, which Dependabot does not
+  update, so they drifted behind the lock and local lint disagreed with CI.
+  The hook runs on every commit, as before. The config now requires pre-commit
+  4.5.0 or later (`minimum_pre_commit_version`). Contributors must install
+  `requirements.txt`, activate the venv if used, and run `pre-commit install`
+  from that toolchain. See `CONTRIBUTING.md`.
+- Every pre-commit hook now runs from the hash-pinned lock. The yamllint hook
+  and the `pre-commit-hooks` hygiene hooks (trailing-whitespace,
+  end-of-file-fixer, check-yaml, check-added-large-files,
+  check-merge-conflict, detect-private-key) are `repo: local` hooks like
+  ansible-lint, and `pre-commit-hooks==5.0.0` is pinned in `requirements.in`.
+  pre-commit downloads nothing, Dependabot's pip updates cover every hook, and
+  the yamllint hook no longer lags the lock (it was v1.35.1 against 1.38.0).
+- The CI lint job runs `pre-commit run --all-files` in place of separate
+  yamllint and ansible-lint steps, so CI also enforces the hygiene hooks and
+  local and CI lint have one definition.
+- `check-added-large-files` runs with `--enforce-all` and
+  `check-merge-conflict` with `--assume-in-merge`. Without them both hooks
+  only inspect staged additions and in-progress merges, so they passed every
+  file in CI. They now reject any file over 500 KB and any committed conflict
+  marker (staged files at commit time, every file in CI).
+- Aligned the pre-commit hook's ansible-core with the lock at 2.21.6 (#27);
+  superseded by the local-hook change above.
+
+### Fixed
+
+- Removed the extra trailing blank line from `tests/inventory`, which the
+  end-of-file-fixer hook now enforces in CI.
+
+### Dependencies
+
+- Bump pre-commit from 4.6.2 to 4.7.0 (#28)
+- Bump ansible-lint from 26.9.0 to 26.10.1 (#29)
+- Bump the codeql-action group with 3 updates (#30, #38)
+- Bump virtualenv from 21.7.13 to 21.14.13 (#32)
+- Bump actions/setup-python from 7.0.0 to 7.1.0 (#33)
+- Bump black from 26.5.1 to 26.10.1 (#35)
+- Bump reviewdog/action-actionlint from 1.79.1 to 1.81.0 (#36)
+- Bump ansible-core from 2.21.4 to 2.21.6 (#37)
+
+## [1.0.0] - 2026-10-15
+
 ### Added
 
 - Optional enclave certificate authority trust, gated behind
@@ -45,34 +114,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on a host with egress could resolve and reach a third-party server.
 - Removed the optional `galaxy_info.company` field.
 - Reworded the README summary from Yum to DNF.
-- The ansible-lint pre-commit hook is now a `repo: local` hook that runs the
-  ansible-lint and ansible-core installed from `requirements.txt`. The hook
-  previously pinned its own copies of both versions, which Dependabot does not
-  update, so they drifted behind the lock and local lint disagreed with CI.
-  The hook runs on every commit, as before. The config now requires pre-commit
-  4.5.0 or later (`minimum_pre_commit_version`). Contributors must install
-  `requirements.txt`, activate the venv if used, and run `pre-commit install`
-  from that toolchain. See `CONTRIBUTING.md`.
-- Every pre-commit hook now runs from the hash-pinned lock. The yamllint hook
-  and the `pre-commit-hooks` hygiene hooks (trailing-whitespace,
-  end-of-file-fixer, check-yaml, check-added-large-files,
-  check-merge-conflict, detect-private-key) are `repo: local` hooks like
-  ansible-lint, and `pre-commit-hooks==5.0.0` is pinned in `requirements.in`.
-  pre-commit downloads nothing, Dependabot's pip updates cover every hook, and
-  the yamllint hook no longer lags the lock (it was v1.35.1 against 1.38.0).
-- The CI lint job runs `pre-commit run --all-files` in place of separate
-  yamllint and ansible-lint steps, so CI also enforces the hygiene hooks and
-  local and CI lint have one definition.
-- `check-added-large-files` runs with `--enforce-all` and
-  `check-merge-conflict` with `--assume-in-merge`. Without them both hooks
-  only inspect staged additions and in-progress merges, so they passed every
-  file in CI. They now reject any file over 500 KB and any committed conflict
-  marker (staged files at commit time, every file in CI).
 
 ### Fixed
 
-- Removed the extra trailing blank line from `tests/inventory`, which the
-  end-of-file-fixer hook now enforces in CI.
 - Granted `actions: read` to the `security` job. `github/codeql-action/upload-sarif`
   calls the workflow-run API to resolve the run it attaches results to, which
   requires that scope on a private repository. Without it the upload step
@@ -116,4 +160,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bump actions/setup-python from 6.3.0 to 7.0.0 (#6)
 - Bump actions/checkout from 7.0.0 to 7.0.1 (#7)
 
-[Unreleased]: https://github.com/mpe-es/ansible-role-local-repo/commits/main
+[Unreleased]: https://github.com/mpe-es/ansible-role-local-repo/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/mpe-es/ansible-role-local-repo/tree/1.0.0
