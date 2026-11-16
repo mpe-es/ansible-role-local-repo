@@ -3,7 +3,7 @@
 # Filename: meta/main.yml
 # Role: ansible-role-local-repo
 # Summary: Ansible Role metadata for local DNF repository configuration
-# Last Updated: 14 Aug 2026
+# Last Updated: 16 Nov 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
 galaxy_info:
@@ -12,7 +12,7 @@ galaxy_info:
   author: Alex Ackerman
   description: Add the Update Repository files for DNF for an airgap Network
   license: Apache-2.0
-  min_ansible_version: '2.10'
+  min_ansible_version: '2.19'
   platforms:
     - name: EL
       versions:

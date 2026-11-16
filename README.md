@@ -5,7 +5,12 @@ Internet repositories.
 
 ## Requirements
 
-None
+- ansible-core 2.19 or later on the controller. CI runs ansible-core 2.21.
+- A managed-host Python that the controller's ansible-core supports. On EL 8
+  the platform Python 3.6 is not one (ansible-core 2.17 dropped it): install
+  a newer Python from AppStream, such as `python3.12`, and point
+  `ansible_python_interpreter` at it. The role uses no `dnf` module, so it
+  does not need the platform Python's `dnf` bindings. CI does not cover EL 8.
 
 ## Role Variables
 

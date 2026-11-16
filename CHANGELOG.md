@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   installs the default `local_repo_enclave_ca_certificates` entry, which has
   no checksum pin, instead of the caller's list. See README "Upgrading from
   1.x". (#44)
+- `meta/main.yml` now declares `min_ansible_version: '2.19'`, matching the
+  other MPE-ES roles; the 2.10 floor was never tested. EL 8 stays listed: the
+  role uses no `dnf` module, so it runs on EL 8 hosts whose
+  `ansible_python_interpreter` is a newer AppStream Python. See README
+  "Requirements".
 - The ansible-lint pre-commit hook is now a `repo: local` hook that runs the
   ansible-lint and ansible-core installed from `requirements.txt`. The hook
   previously pinned its own copies of both versions, which Dependabot does not
