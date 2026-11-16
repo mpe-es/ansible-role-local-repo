@@ -6,9 +6,6 @@
 # Last Updated: 16 Nov 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
-- name: Reject the pre-2.0.0 variable names
-  ansible.builtin.import_tasks: assert-renamed.yml
-
 # Trust first. The repository mirrors below are reached over HTTPS, so the
 # enclave anchors have to be installed before any repository file is written.
 - name: Configure Enclave Certificate Authorities

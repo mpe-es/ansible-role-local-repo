@@ -20,18 +20,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `web_protocol` -> `local_repo_web_protocol`,
   `configure_local_cert_authority` -> `local_repo_configure_cert_authority`,
   `enclave_ca_certificates` -> `local_repo_enclave_ca_certificates`.
-  Every entry point, including `tasks_from`, first runs
-  `tasks/assert-renamed.yml`, which fails, naming every rename, if any of the
-  first six old names is defined in scope. The two CA names are not rejected
-  outright because a calling role may own them; instead
-  `tasks/configure-ca.yml` refuses to install anchors while
-  `enclave_ca_certificates` differs from `local_repo_enclave_ca_certificates`,
-  which would otherwise install `local_repo_enclave_ca_certificates` (by
-  default an unpinned anchor) in place of the caller's list. A 1.x caller
-  that still sets `configure_local_cert_authority: true` through the main
-  entry point silently gets CA trust off, which surfaces as a TLS error
-  against the mirror. `tests/rename-guard.yml` runs in CI through every entry
-  point. See README "Upgrading from 1.x".
+  The role does not detect the 1.x names: a variable left under its old name
+  is ignored and the new name's default applies. A CA list left under
+  `enclave_ca_certificates` with `local_repo_configure_cert_authority: true`
+  installs the default `local_repo_enclave_ca_certificates` entry, which has
+  no checksum pin, instead of the caller's list. The folder defaults are
+  RHEL 10 paths, so an EL 8 or EL 9 host left on the 1.x folder names is
+  pointed at RHEL 10 repositories without an error. See README "Upgrading from
+  1.x". (#44)
+- `meta/main.yml` now declares `min_ansible_version: '2.19'`, matching
+  `system_base`, the role that includes this one. CI runs ansible-core 2.21
+  only; `min_ansible_version` is Galaxy metadata, not enforced. EL 8 stays listed: the
+  role uses no `dnf` module, so it runs on EL 8 hosts whose
+  `ansible_python_interpreter` is a newer AppStream Python. See README
+  "Requirements".
 - The ansible-lint pre-commit hook is now a `repo: local` hook that runs the
   ansible-lint and ansible-core installed from `requirements.txt`. The hook
   previously pinned its own copies of both versions, which Dependabot does not
@@ -39,14 +41,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The hook runs on every commit, as before. The config now requires pre-commit
   4.5.0 or later (`minimum_pre_commit_version`). Contributors must install
   `requirements.txt`, activate the venv if used, and run `pre-commit install`
-  from that toolchain. See `CONTRIBUTING.md`.
+  from that toolchain. See `CONTRIBUTING.md`. (#39)
 - Every pre-commit hook now runs from the hash-pinned lock. The yamllint hook
   and the `pre-commit-hooks` hygiene hooks (trailing-whitespace,
   end-of-file-fixer, check-yaml, check-added-large-files,
   check-merge-conflict, detect-private-key) are `repo: local` hooks like
-  ansible-lint, and `pre-commit-hooks==5.0.0` is pinned in `requirements.in`.
+  ansible-lint, and `pre-commit-hooks` is pinned in `requirements.in`.
   pre-commit downloads nothing, Dependabot's pip updates cover every hook, and
   the yamllint hook no longer lags the lock (it was v1.35.1 against 1.38.0).
+  (#40)
 - The CI lint job runs `pre-commit run --all-files` in place of separate
   yamllint and ansible-lint steps, so CI also enforces the hygiene hooks and
   local and CI lint have one definition.
@@ -63,6 +66,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed the extra trailing blank line from `tests/inventory`, which the
   end-of-file-fixer hook now enforces in CI.
 
+### Security
+
+- Bump the toolchain's transitive `filelock` from 3.32.3 to 4.2.10, fixing
+  CVE-2026-112940 (HIGH) and the 11 other Dependabot alerts against it.
+  `filelock` is only in the lint and CI toolchain (`requirements.txt`);
+  nothing the role installs on a managed host was affected. (#51)
+
 ### Dependencies
 
 - Bump pre-commit from 4.6.2 to 4.7.0 (#28)
@@ -73,6 +83,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bump black from 26.5.1 to 26.10.1 (#35)
 - Bump reviewdog/action-actionlint from 1.79.1 to 1.81.0 (#36)
 - Bump ansible-core from 2.21.4 to 2.21.6 (#37)
+- Bump ansible-lint from 26.10.1 to 26.11.0 (#45)
+- Bump reviewdog/action-actionlint from 1.81.0 to 1.84.0 (#46)
+- Bump pre-commit-hooks from 5.0.0 to 6.0.0 (#47)
 
 ## [1.0.0] - 2026-10-15
 
