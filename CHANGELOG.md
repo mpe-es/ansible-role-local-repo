@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-16
+
 ### Changed
 
 - **BREAKING:** every role variable now carries the `local_repo_` prefix, so
@@ -173,5 +175,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bump actions/setup-python from 6.3.0 to 7.0.0 (#6)
 - Bump actions/checkout from 7.0.0 to 7.0.1 (#7)
 
-[Unreleased]: https://github.com/mpe-es/ansible-role-local-repo/compare/1.0.0...HEAD
+[Unreleased]: https://github.com/mpe-es/ansible-role-local-repo/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/mpe-es/ansible-role-local-repo/compare/1.0.0...2.0.0
 [1.0.0]: https://github.com/mpe-es/ansible-role-local-repo/tree/1.0.0
