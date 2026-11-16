@@ -3,7 +3,7 @@
 # Filename: .github/ISSUE_TEMPLATE/feature_request.yml
 # Role: ansible-role-local-repo
 # Summary: Issue form for proposing an enhancement or new platform support
-# Last Updated: 17 Aug 2026
+# Last Updated: 16 Nov 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
 name: Feature request
@@ -65,7 +65,7 @@ body:
         touches any of the following.
       options:
         - label: This proposal does NOT weaken or disable gpgcheck
-        - label: This proposal does NOT default web_protocol to http
+        - label: This proposal does NOT default local_repo_web_protocol to http
         - label: This proposal does NOT introduce a publicly registrable default hostname
   - type: textarea
     id: alternatives

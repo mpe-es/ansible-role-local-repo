@@ -31,6 +31,7 @@
 ```
 pre-commit run --all-files
 ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+ansible-playbook tests/rename-guard.yml --check
 ```
 
 ## Checklist
@@ -50,7 +51,7 @@ ansible-playbook tests/test.yml -i tests/inventory --syntax-check
 
 - [ ] `gpgcheck` remains `true` on every repository this role defines
 - [ ] Every repository definition still has an explicit `gpgkey`
-- [ ] `web_protocol` still defaults to `https`
+- [ ] `local_repo_web_protocol` still defaults to `https`
 - [ ] No default uses a publicly registrable hostname (use `.local` or `.invalid`)
 - [ ] No secrets, credentials, internal hostnames, enclave names, or unit identifiers are included in the code, comments, or commit messages
 - [ ] This PR does not report a security vulnerability (use private reporting instead)

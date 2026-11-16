@@ -3,7 +3,7 @@
 # Filename: .github/ISSUE_TEMPLATE/bug_report.yml
 # Role: ansible-role-local-repo
 # Summary: Issue form for reporting a defect in the role's behavior
-# Last Updated: 17 Aug 2026
+# Last Updated: 16 Nov 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
 name: Bug report
@@ -60,13 +60,14 @@ body:
     attributes:
       label: Role variables in use
       description: >
-        The values you passed for local_repo_server, web_protocol, and the
-        repo folder variables. Replace real hostnames with a placeholder.
+        The values you passed for local_repo_server, local_repo_web_protocol,
+        and the repo folder variables. Replace real hostnames with a
+        placeholder.
       render: yaml
       placeholder: |
         local_repo_server: repo.example.invalid
-        web_protocol: https
-        local_baseos_repo_folder: rhel-10-for-x86_64-baseos-rpms
+        local_repo_web_protocol: https
+        local_repo_baseos_folder: rhel-10-for-x86_64-baseos-rpms
     validations:
       required: true
   - type: checkboxes

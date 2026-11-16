@@ -3,9 +3,12 @@
 # Filename: tasks/oracle.yml
 # Role: ansible-role-local-repo
 # Summary: Point Oracle Linux hosts at the local DNF repository mirrors
-# Last Updated: 17 Aug 2026
+# Last Updated: 16 Nov 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
+- name: Reject the pre-2.0.0 variable names
+  ansible.builtin.import_tasks: assert-renamed.yml
+
 ###########################################################
 # Remove Original DNF Repo Files
 ###########################################################
@@ -25,17 +28,17 @@
   ansible.builtin.yum_repository:
     name: OL9-BaseOS
     description: Oracle Linux BaseOS Respository Mirror
-    baseurl: "{{ web_protocol }}://{{ local_repo_server }}/{{ oracle9_baseos_repo_folder }}/"
+    baseurl: "{{ local_repo_web_protocol }}://{{ local_repo_server }}/{{ local_repo_oracle9_baseos_folder }}/"
     gpgcheck: true
-    gpgkey: '{{ oracle9_gpg_key }}'
+    gpgkey: '{{ local_repo_oracle9_gpg_key }}'
     enabled: true
     state: present
 - name: Add Oracle AppStream Repository Mirror
   ansible.builtin.yum_repository:
     name: OL9-AppStream
     description: Oracle Linux AppStream Respository Mirror
-    baseurl: "{{ web_protocol }}://{{ local_repo_server }}/{{ oracle9_appstream_repo_folder }}/"
+    baseurl: "{{ local_repo_web_protocol }}://{{ local_repo_server }}/{{ local_repo_oracle9_appstream_folder }}/"
     gpgcheck: true
-    gpgkey: '{{ oracle9_gpg_key }}'
+    gpgkey: '{{ local_repo_oracle9_gpg_key }}'
     enabled: true
     state: present
