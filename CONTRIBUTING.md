@@ -93,8 +93,8 @@ pip install --require-hashes -r requirements.txt
 deactivate
 ```
 
-> **Note**: When using a venv, you must activate it before running any development
-> commands (ansible-lint, pre-commit, etc.).
+> **Note**: When using a venv, you must activate it before running any
+> development commands (ansible-lint, pre-commit, `git commit`, etc.).
 
 ##### Verify Installation
 
@@ -112,8 +112,8 @@ pre-commit --version
 This repository uses pre-commit hooks to ensure code quality before commits:
 
 ```bash
-# Install hooks (one-time setup)
-pre-commit install
+# Install hooks with the requirements.txt toolchain (see below)
+python -m pre_commit install
 
 # Run manually on all files
 pre-commit run --all-files
@@ -123,13 +123,63 @@ pre-commit run --all-files
 
 The following hooks are configured:
 - **yamllint** - YAML syntax and style validation
-- **ansible-lint** - Ansible best practices (production profile)
+- **ansible-lint** - Ansible best practices (production profile), run from
+  your installed `requirements.txt` toolchain (see below)
 - **trailing-whitespace** - Remove trailing whitespace
 - **end-of-file-fixer** - Ensure files end with newline
 - **check-yaml** - Validate YAML syntax
 - **check-added-large-files** - Prevent large files (>500KB)
 - **check-merge-conflict** - Detect merge conflict markers
 - **detect-private-key** - Prevent accidental key commits
+
+#### The ansible-lint hook uses your installed toolchain
+
+The ansible-lint hook is a `repo: local` hook. pre-commit does not build an
+environment for it; it runs whichever `ansible-lint` is first on your `PATH`.
+That is the ansible-lint and ansible-core you installed from the hash-pinned
+`requirements.txt`, which are the same versions CI runs. A lint rule that would
+fail in CI therefore fails your commit first, and there is no second copy of
+the versions in `.pre-commit-config.yaml` to keep in sync. For Python tooling,
+Dependabot updates `requirements.in` and `requirements.txt` only. The hook runs
+on every commit, including commits that only change the lock.
+
+This means:
+
+- **Install the dependencies before running pre-commit.** Use Option A or
+  Option B above. With a venv, activate it before `git commit`. Commits made
+  from an IDE or GUI Git client use that tool's environment, which may not
+  include the venv.
+- **Run `pre-commit install` with the locked pre-commit.** The config requires
+  pre-commit 4.5.0 or later. `pre-commit install` records the Python
+  interpreter that ran it, and every later `git commit` uses that interpreter's
+  pre-commit, even with the venv active. Run `python -m pre_commit install`
+  (with the venv active, for Option B) so the locked pre-commit is recorded.
+  If you installed the hooks earlier with a distro or pipx pre-commit, run it
+  again.
+- **Reinstall after the lock changes.** When you pull a change to
+  `requirements.txt`, such as a merged Dependabot update, rerun:
+
+  ```bash
+  python -m pip install --require-hashes -r requirements.txt
+  ```
+
+  Until you do, the hook lints with the previous versions and can disagree
+  with CI.
+- **Check the versions match.** `ansible-lint --version` reports the
+  ansible-lint and ansible-core versions in use. They should equal the
+  `ansible-lint==` and `ansible-core==` pins in `requirements.txt`.
+
+Troubleshooting:
+
+- ``Executable `ansible-lint` not found``: the dependencies are not installed
+  or the venv is not active.
+- `pre-commit version 4.5.0 is required but version X is installed`: the git
+  hook was installed by an older pre-commit. Rerun `pre-commit install` as
+  described above.
+- A traceback, or lint results that differ from CI: another `ansible-lint`
+  earlier on your `PATH` (for example a pipx or distro copy) is being used.
+  Check that `command -v ansible-lint` points into your venv or Option A
+  install and that `ansible-lint --version` matches `requirements.txt`.
 
 ### Testing
 
