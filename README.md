@@ -10,7 +10,9 @@ Internet repositories.
   the platform Python 3.6 is not one (ansible-core 2.17 dropped it): install
   a newer Python from AppStream, such as `python3.12`, and point
   `ansible_python_interpreter` at it. The role uses no `dnf` module, so it
-  does not need the platform Python's `dnf` bindings. CI does not cover EL 8.
+  does not need the platform Python's `dnf` bindings.
+
+CI lints and syntax-checks the role; it does not run the role on any platform.
 
 ## Role Variables
 
@@ -48,8 +50,9 @@ prefix. Rename these in your inventory, playbooks, and `include_role` `vars:`:
 | `enclave_ca_certificates` | `local_repo_enclave_ca_certificates` |
 
 The role does not check for the 1.x names. A variable left under its old name
-is ignored, and the role uses the default for the new name instead.
-In particular, a CA list left under `enclave_ca_certificates` while
+is ignored, and the role uses the default for the new name instead. The
+folder defaults are RHEL 10 paths, so an EL 8 or EL 9 host left on the 1.x
+folder names is pointed at RHEL 10 repositories without an error. A CA list left under `enclave_ca_certificates` while
 `local_repo_configure_cert_authority` is `true` installs the default
 `local_repo_enclave_ca_certificates` entry, which has no checksum pin, in
 place of yours.

@@ -24,10 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is ignored and the new name's default applies. A CA list left under
   `enclave_ca_certificates` with `local_repo_configure_cert_authority: true`
   installs the default `local_repo_enclave_ca_certificates` entry, which has
-  no checksum pin, instead of the caller's list. See README "Upgrading from
+  no checksum pin, instead of the caller's list. The folder defaults are
+  RHEL 10 paths, so an EL 8 or EL 9 host left on the 1.x folder names is
+  pointed at RHEL 10 repositories without an error. See README "Upgrading from
   1.x". (#44)
-- `meta/main.yml` now declares `min_ansible_version: '2.19'`, matching the
-  other MPE-ES roles; the 2.10 floor was never tested. EL 8 stays listed: the
+- `meta/main.yml` now declares `min_ansible_version: '2.19'`, matching
+  `system_base`, the role that includes this one. CI runs ansible-core 2.21
+  only; `min_ansible_version` is Galaxy metadata, not enforced. EL 8 stays listed: the
   role uses no `dnf` module, so it runs on EL 8 hosts whose
   `ansible_python_interpreter` is a newer AppStream Python. See README
   "Requirements".
@@ -38,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The hook runs on every commit, as before. The config now requires pre-commit
   4.5.0 or later (`minimum_pre_commit_version`). Contributors must install
   `requirements.txt`, activate the venv if used, and run `pre-commit install`
-  from that toolchain. See `CONTRIBUTING.md`.
+  from that toolchain. See `CONTRIBUTING.md`. (#39)
 - Every pre-commit hook now runs from the hash-pinned lock. The yamllint hook
   and the `pre-commit-hooks` hygiene hooks (trailing-whitespace,
   end-of-file-fixer, check-yaml, check-added-large-files,
@@ -46,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ansible-lint, and `pre-commit-hooks` is pinned in `requirements.in`.
   pre-commit downloads nothing, Dependabot's pip updates cover every hook, and
   the yamllint hook no longer lags the lock (it was v1.35.1 against 1.38.0).
+  (#40)
 - The CI lint job runs `pre-commit run --all-files` in place of separate
   yamllint and ansible-lint steps, so CI also enforces the hygiene hooks and
   local and CI lint have one definition.
