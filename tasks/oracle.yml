@@ -6,9 +6,6 @@
 # Last Updated: 16 Nov 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
-- name: Reject the pre-2.0.0 variable names
-  ansible.builtin.import_tasks: assert-renamed.yml
-
 ###########################################################
 # Remove Original DNF Repo Files
 ###########################################################

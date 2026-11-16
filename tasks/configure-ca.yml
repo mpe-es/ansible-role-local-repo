@@ -6,22 +6,6 @@
 # Last Updated: 16 Nov 2026
 # Classification: UNCLASSIFIED
 ###############################################################################
-- name: Reject the pre-2.0.0 variable names
-  ansible.builtin.import_tasks: assert-renamed.yml
-
-- name: Reject CA anchors left under the pre-2.0.0 list name
-  ansible.builtin.assert:
-    that:
-      - >-
-        query('ansible.builtin.varnames', '^enclave_ca_certificates$') | length == 0
-        or enclave_ca_certificates == local_repo_enclave_ca_certificates
-    fail_msg: >-
-      enclave_ca_certificates is set and differs from
-      local_repo_enclave_ca_certificates, but the role reads only
-      local_repo_enclave_ca_certificates. Rename enclave_ca_certificates ->
-      local_repo_enclave_ca_certificates, or remove it.
-    quiet: true
-
 # Trust bootstrap ordering: the anchors must land and the trust store must be
 # rebuilt BEFORE the repository files are written, because those repositories
 # are served over HTTPS by a host whose certificate this CA issued.

@@ -97,9 +97,6 @@ jobs:
       - name: Run syntax check
         run: ansible-playbook tests/test.yml -i tests/inventory --syntax-check
 
-      - name: Run the 2.0.0 rename guard regression test
-        run: ansible-playbook tests/rename-guard.yml --check
-
   ###########################################################
   # Security Scan Stage
   ###########################################################

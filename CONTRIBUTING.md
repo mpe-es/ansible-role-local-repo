@@ -198,18 +198,15 @@ Troubleshooting:
 
 ### Testing
 
-This role has no Molecule suite. The full local test cycle is the same lint,
-syntax, and rename-guard checks CI runs (CI also runs actionlint and a Trivy
-scan):
+This role has no Molecule suite. The full local test cycle is the same lint and
+syntax checks CI runs (CI also runs actionlint and a Trivy scan):
 
 ```bash
 pre-commit run --all-files
 ansible-playbook tests/test.yml -i tests/inventory --syntax-check
-ansible-playbook tests/rename-guard.yml --check
 ```
 
-The pre-commit run includes yamllint and ansible-lint; `tests/rename-guard.yml`
-checks that the 2.0.0 variable-rename guard still rejects 1.x names.
+The pre-commit run includes yamllint and ansible-lint.
 `ansible-lint` runs the `production` profile with `strict: true`, so warnings
 fail the run. All must pass before a pull request will be merged.
 
@@ -245,7 +242,6 @@ Security vulnerabilities must **not** be reported as public issues. See
    ```bash
    pre-commit run --all-files
    ansible-playbook tests/test.yml -i tests/inventory --syntax-check
-   ansible-playbook tests/rename-guard.yml --check
    ```
 5. **Commit** using [Conventional Commits](https://www.conventionalcommits.org/):
    ```bash

@@ -31,7 +31,6 @@
 ```
 pre-commit run --all-files
 ansible-playbook tests/test.yml -i tests/inventory --syntax-check
-ansible-playbook tests/rename-guard.yml --check
 ```
 
 ## Checklist

@@ -20,18 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `web_protocol` -> `local_repo_web_protocol`,
   `configure_local_cert_authority` -> `local_repo_configure_cert_authority`,
   `enclave_ca_certificates` -> `local_repo_enclave_ca_certificates`.
-  Every entry point, including `tasks_from`, first runs
-  `tasks/assert-renamed.yml`, which fails, naming every rename, if any of the
-  first six old names is defined in scope. The two CA names are not rejected
-  outright because a calling role may own them; instead
-  `tasks/configure-ca.yml` refuses to install anchors while
-  `enclave_ca_certificates` differs from `local_repo_enclave_ca_certificates`,
-  which would otherwise install `local_repo_enclave_ca_certificates` (by
-  default an unpinned anchor) in place of the caller's list. A 1.x caller
-  that still sets `configure_local_cert_authority: true` through the main
-  entry point silently gets CA trust off, which surfaces as a TLS error
-  against the mirror. `tests/rename-guard.yml` runs in CI through every entry
-  point. See README "Upgrading from 1.x".
+  The role does not detect the 1.x names: a variable left under its old name
+  is ignored and the new name's default applies. A CA list left under
+  `enclave_ca_certificates` with `local_repo_configure_cert_authority: true`
+  installs the default `local_repo_enclave_ca_certificates` entry, which has
+  no checksum pin, instead of the caller's list. See README "Upgrading from
+  1.x". (#44)
 - The ansible-lint pre-commit hook is now a `repo: local` hook that runs the
   ansible-lint and ansible-core installed from `requirements.txt`. The hook
   previously pinned its own copies of both versions, which Dependabot does not
