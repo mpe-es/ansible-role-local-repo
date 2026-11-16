@@ -24,21 +24,19 @@
 ## Testing performed
 
 <!--
-  Paste the result of the three local checks, and describe any manual
+  Paste the result of the two local checks, and describe any manual
   verification against a real or test repository mirror.
 -->
 
 ```
-yamllint .
-ansible-lint
+pre-commit run --all-files
 ansible-playbook tests/test.yml -i tests/inventory --syntax-check
 ```
 
 ## Checklist
 
 - [ ] Commits follow Conventional Commits (`feat:`, `fix:`, `docs:`, `ci:`, `deps:`, `chore:`)
-- [ ] `yamllint` passes locally
-- [ ] `ansible-lint` passes locally (profile `production`, `strict: true`)
+- [ ] `pre-commit run --all-files` passes locally (includes yamllint and ansible-lint, profile `production`, `strict: true`)
 - [ ] Playbook `--syntax-check` passes
 - [ ] Every new or modified YAML file carries the UNCLASSIFIED classification banner
 - [ ] `Last Updated` is current in the banner of every file I changed

@@ -53,9 +53,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   4.5.0 or later (`minimum_pre_commit_version`). Contributors must install
   `requirements.txt`, activate the venv if used, and run `pre-commit install`
   from that toolchain. See `CONTRIBUTING.md`.
+- Every pre-commit hook now runs from the hash-pinned lock. The yamllint hook
+  and the `pre-commit-hooks` hygiene hooks (trailing-whitespace,
+  end-of-file-fixer, check-yaml, check-added-large-files,
+  check-merge-conflict, detect-private-key) are `repo: local` hooks like
+  ansible-lint, and `pre-commit-hooks==5.0.0` is pinned in `requirements.in`.
+  pre-commit downloads nothing, Dependabot's pip updates cover every hook, and
+  the yamllint hook no longer lags the lock (it was v1.35.1 against 1.38.0).
+- The CI lint job runs `pre-commit run --all-files` in place of separate
+  yamllint and ansible-lint steps, so CI also enforces the hygiene hooks and
+  local and CI lint have one definition.
+- `check-added-large-files` runs with `--enforce-all` and
+  `check-merge-conflict` with `--assume-in-merge`. Without them both hooks
+  only inspect staged additions and in-progress merges, so they passed every
+  file in CI. They now reject any file over 500 KB and any committed conflict
+  marker (staged files at commit time, every file in CI).
 
 ### Fixed
 
+- Removed the extra trailing blank line from `tests/inventory`, which the
+  end-of-file-fixer hook now enforces in CI.
 - Granted `actions: read` to the `security` job. `github/codeql-action/upload-sarif`
   calls the workflow-run API to resolve the run it attaches results to, which
   requires that scope on a private repository. Without it the upload step
